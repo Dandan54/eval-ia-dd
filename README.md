@@ -12,8 +12,8 @@ This repository contains a Python script that uses Azure Cognitive Services to c
 
 1. **Clone the repository**:
 
-   git clone https://github.com/your-username/your-repo-name.git  
-   cd your-repo-name
+   git clone https://github.com/Dandan54/eval-ia-dd.git    
+   cd eval-ia-dd
 
 2. **Fill the env file with your information**:
 
