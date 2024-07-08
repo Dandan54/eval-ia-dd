@@ -1,6 +1,6 @@
 # Speech to Text and Translation Script
 
-This repository contains a Python script that uses Azure Cognitive Services to convert speech to text and translate the detected text into English. It supports automatic language detection and requires appropriate Azure services credentials.
+This repository contains a Python script that uses Azure Cognitive Services to convert speech to text, translate the detected text into English, and synthesize translated text into speech. It supports automatic language detection and requires appropriate Azure services credentials.
 
 ## Prerequisites
 
