@@ -2,9 +2,9 @@ from dotenv import load_dotenv
 import os
 import argparse
 import azure.cognitiveservices.speech as speech_sdk
-import uuid
 from azure.ai.translation.text import TranslatorCredential, TextTranslationClient
 from azure.ai.translation.text.models import InputTextItem
+from azure.cognitiveservices.speech.audio import AudioOutputConfig
 from playsound import playsound
 
 def main():
@@ -46,7 +46,22 @@ def main():
         # Translate the detected command to English
         translated_command = translate_text(client, command, detected_language)
         if translated_command:
-            print(f"Translation succeed !")
+            print(f"Original command in {detected_language}: {command}")
+            print(f"Translated command in English: {translated_command}")
+
+            # Ask for a response in English
+            response = input("Enter your response in English: ")
+
+            # Translate the response to the detected language
+            translated_response = translate_text_to_original_language(client, response, detected_language)
+
+            if translated_response:
+                print(f"Translated response in {detected_language}: {translated_response}")
+                # Speak the translated response in the detected language
+                text_to_speech(translated_response, detected_language, ai_key, ai_region)
+            else:
+                print("Translation of response failed.")
+
         else:
             print("Translation failed.")
 
@@ -71,7 +86,6 @@ def TranscribeCommand(audio_file):
             detected_language = speech.properties.get(speech_sdk.PropertyId.SpeechServiceConnection_AutoDetectSourceLanguageResult)
             command = speech.text
             print(f"Detected language: {detected_language}")
-            #print(f"Original command: {command}")
         else:
             print(f"Speech recognition failed: {speech.reason}")
             if speech.reason == speech_sdk.ResultReason.Canceled:
@@ -87,23 +101,71 @@ def TranscribeCommand(audio_file):
 
 def translate_text(client, text_to_translate, detected_language):
     try:
-        # Construct body of request
-        input_text_elements = [InputTextItem(text=text_to_translate)]
-
         # Translate the text to English
+        input_text_elements = [InputTextItem(text=text_to_translate)]
         translation_response = client.translate(content=input_text_elements, to=["en"])
         translation = translation_response[0] if translation_response else None
 
-        # Extract translated text from response
+        # Check if translation was successful
         if translation:
             source_language = translation.detected_language
             for translated_text in translation.translations:
-                print(f"'{text_to_translate}' was translated from {source_language.language} to {translated_text.to} as '{translated_text.text}'.")
                 return translated_text.text
 
     except Exception as ex:
         print(f"Translation failed: {ex}")
         return None
+
+def translate_text_to_original_language(client, text_to_translate, original_language):
+    try:
+        # Translate the text to original language
+        input_text_elements = [InputTextItem(text=text_to_translate)]
+        translation_response = client.translate(content=input_text_elements, to=[original_language])
+        translation = translation_response[0] if translation_response else None
+
+        # Check if translation was successful
+        if translation:
+            for translated_text in translation.translations:
+                return translated_text.text
+
+    except Exception as ex:
+        print(f"Translation to original language failed: {ex}")
+        return None
+
+def text_to_speech(text_to_speak, language, ai_key, ai_region):
+    try:
+        # Configure speech synthesis
+        speech_config = speech_sdk.SpeechConfig(subscription=ai_key, region=ai_region)
+
+        # Configure language for text-to-speech
+        if language.startswith("en"):
+            speech_config.speech_synthesis_language = "en-US"
+        elif language.startswith("fr"):
+            speech_config.speech_synthesis_language = "fr-FR"
+        elif language.startswith("ja"):
+            speech_config.speech_synthesis_language = "ja-JP"
+        elif language.startswith("it"):
+            speech_config.speech_synthesis_language = "it-IT"
+
+        audio_config = AudioOutputConfig(use_default_speaker=True)
+
+        # Create a speech synthesizer
+        synthesizer = speech_sdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
+
+        # Speak the text
+        result = synthesizer.speak_text_async(text_to_speak).get()
+
+        if result.reason == speech_sdk.ResultReason.SynthesizingAudioCompleted:
+            print(f"Successfully synthesized speech in {language}: {text_to_speak}")
+
+        elif result.reason == speech_sdk.ResultReason.Canceled:
+            cancellation = result.cancellation_details
+            print(f"Speech synthesis canceled: {cancellation.reason}")
+            if cancellation.reason == speech_sdk.CancellationReason.Error:
+                print(f"Error details: {cancellation.error_details}")
+
+    except Exception as ex:
+        print(f"Speech synthesis failed: {ex}")
 
 if __name__ == "__main__":
     main()
