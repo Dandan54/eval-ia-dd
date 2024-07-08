@@ -12,20 +12,20 @@ This repository contains a Python script that uses Azure Cognitive Services to c
 
 1. **Clone the repository**:
 
-   git clone https://github.com/your-username/your-repo-name.git
+   git clone https://github.com/your-username/your-repo-name.git  
    cd your-repo-name
 
 2. **Fill the env file with your information**:
 
-   SPEECH_KEY=your_speech_key
-   SPEECH_REGION=your_speech_region
-   TRANSLATE_KEY=your_translate_key
-   TRANSLATOR_REGION=your_translator_region
-   TRANSLATE_ENDPOINT=https://<your-translator-resource-name>.cognitiveservices.azure.com
+   SPEECH_KEY=your_speech_key  
+   SPEECH_REGION=your_speech_region  
+   TRANSLATE_KEY=your_translate_key  
+   TRANSLATOR_REGION=your_translator_region  
+   TRANSLATE_ENDPOINT=https://<your-translator-resource-name>.cognitiveservices.azure.com  
 
 - Replace the placeholders with your actual Azure credentials.
 
-4. **Usage**:
+3. **Usage**:
 
    python main.py path_to_audio_file
 
