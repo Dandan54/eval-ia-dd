@@ -21,7 +21,7 @@ This repository contains a Python script that uses Azure Cognitive Services to c
    SPEECH_REGION=your_speech_region  
    TRANSLATE_KEY=your_translate_key  
    TRANSLATOR_REGION=your_translator_region  
-   TRANSLATE_ENDPOINT=https://<your-translator-resource-name>.cognitiveservices.azure.com  
+   TRANSLATE_ENDPOINT=https://your-translator-resource-name.cognitiveservices.azure.com  
 
 - Replace the placeholders with your actual Azure credentials.
 
